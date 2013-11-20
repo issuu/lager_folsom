@@ -68,7 +68,7 @@ initialize_metrics() ->
     ok.
       
 parse_level(Level) ->
-	try lager_util:config_to_mask(level) of
+	try lager_util:config_to_mask(Level) of
 	  Res -> Res
 	catch
 	  error:undef ->
