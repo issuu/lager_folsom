@@ -34,7 +34,13 @@ handle_event({log, Level, {_Date, _Tme}, [_LevelStr, _Location, _Message]},
 handle_event({log, Message}, #state { level = Level } = State) ->
     case lager_util:is_loggable(Message, Level, State#state.id) of
         true ->
-          ok = folsom_log(convert_level(lager_msg:severity_as_int(Message))),
+          Module = msg_module(Message),
+          MF = msg_module_function(Message),
+          L = convert_level(lager_msg:severity_as_int(Message)),
+          folsom_metrics:notify({iolist_to_atom(["lager.all.", L]), {inc, 1}}),
+          folsom_metrics:notify(iolist_to_atom(["lager.", Module, ".", L]), {inc, 1}, counter),
+          folsom_metrics:notify(iolist_to_atom(["lager.", MF, ".", L]), {inc, 1}, counter),
+
           {ok, State};
         false ->
           {ok, State}
@@ -54,17 +60,26 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal stuff
 %% ------------------------------------
 
+msg_module(Msg) ->
+    lager_default_formatter:format(Msg, [{module, "unknown"}]).
+    
+msg_module_function(Msg) ->
+    lager_default_formatter:format(Msg, [{module, "unknown"}, ".", {function, "unknown"}]).
+
+iolist_to_atom(L) ->
+  binary_to_atom(iolist_to_binary(L), utf8).
+
 initialize_metrics() ->
     [folsom_metrics:new_counter(C)
       || C <-
-        ['lager.emergency',
-         'lager.alert',
-         'lager.critical',
-         'lager.error',
-         'lager.warning',
-         'lager.notice',
-         'lager.info',
-         'lager.debug'] ],
+        ['lager.all.emergency',
+         'lager.all.alert',
+         'lager.all.critical',
+         'lager.all.error',
+         'lager.all.warning',
+         'lager.all.notice',
+         'lager.all.info',
+         'lager.all.debug'] ],
     ok.
       
 parse_level(Level) ->
@@ -78,11 +93,12 @@ parse_level(Level) ->
 folsom_log(Level) ->
     folsom_metrics:notify({Level, {inc, 1}}).
 
-convert_level(?DEBUG) -> 'lager.debug';
-convert_level(?INFO) -> 'lager.info';
-convert_level(?NOTICE) -> 'lager.notice';
-convert_level(?WARNING) -> 'lager.warning';
-convert_level(?ERROR) -> 'lager.error';
-convert_level(?CRITICAL) -> 'lager.critical';
-convert_level(?ALERT) -> 'lager.alert';
-convert_level(?EMERGENCY) -> 'lager.emergency'.
+
+convert_level(?DEBUG) -> 'debug';
+convert_level(?INFO) -> 'info';
+convert_level(?NOTICE) -> 'notice';
+convert_level(?WARNING) -> 'warning';
+convert_level(?ERROR) -> 'error';
+convert_level(?CRITICAL) -> 'critical';
+convert_level(?ALERT) -> 'alert';
+convert_level(?EMERGENCY) -> 'emergency'.
