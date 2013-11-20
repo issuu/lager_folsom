@@ -1,0 +1,12 @@
+{application, lager_folsom,
+ [
+  {description, "Folsom counter-backend for lager"},
+  {vsn, "2.0"},
+  {modules, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  folsom
+                 ]},
+  {registered, []}
+ ]}.
