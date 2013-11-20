@@ -94,11 +94,11 @@ folsom_log(Level) ->
     folsom_metrics:notify({Level, {inc, 1}}).
 
 
-convert_level(?DEBUG) -> 'debug';
-convert_level(?INFO) -> 'info';
-convert_level(?NOTICE) -> 'notice';
-convert_level(?WARNING) -> 'warning';
-convert_level(?ERROR) -> 'error';
-convert_level(?CRITICAL) -> 'critical';
-convert_level(?ALERT) -> 'alert';
-convert_level(?EMERGENCY) -> 'emergency'.
+convert_level(?DEBUG) -> <<"debug">>;
+convert_level(?INFO) -> <<"info">>;
+convert_level(?NOTICE) -> <<"notice">>;
+convert_level(?WARNING) -> <<"warning">>;
+convert_level(?ERROR) -> <<"error">>;
+convert_level(?CRITICAL) -> <<"critical">>;
+convert_level(?ALERT) -> <<"alert">>;
+convert_level(?EMERGENCY) -> <<"emergency">>.
