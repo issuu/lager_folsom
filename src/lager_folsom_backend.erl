@@ -34,7 +34,7 @@ handle_event({log, Level, {_Date, _Tme}, [_LevelStr, _Location, _Message]},
 handle_event({log, Message}, #state { level = Level } = State) ->
     case lager_util:is_loggable(Message, Level, State#state.id) of
         true ->
-          ok = folsom_log(convert_level(Level)),
+          ok = folsom_log(convert_level(lager_msg:severity_as_int(Message))),
           {ok, State};
         false ->
           {ok, State}
