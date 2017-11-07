@@ -1,0 +1,4 @@
+ebin/
+.git
+deps
+.rebar/
